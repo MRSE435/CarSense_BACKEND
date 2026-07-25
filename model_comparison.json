@@ -1,0 +1,44 @@
+{
+  "models": [
+    {
+      "Bulletcolor": "#6938D4",
+      "name": "Linear Regression",
+      "test_r2": 0.9053,
+      "train_r2": 0.91545,
+      "mae": 116218.35,
+      "status": "Good"
+    },
+    {
+      "Bulletcolor": "#3061E5",
+      "name": "Ridge",
+      "test_r2": 0.9062,
+      "train_r2": 0.9301,
+      "mae": 118288,
+      "status": "Good"
+    },
+    {
+      "Bulletcolor": "#F66519",
+      "name": "Lasso",
+      "test_r2": 0.8968,
+      "train_r2": 0.8625,
+      "mae": 123782,
+      "status": "Average"
+    },
+    {
+      "Bulletcolor": "#22C853",
+      "name": "Random Forest",
+      "test_r2": 0.9356,
+      "train_r2": 0.9535,
+      "mae": 100200.63,
+      "status": "Very Good"
+    },
+    {
+      "Bulletcolor": "#7D3AE2",
+      "name": "XGBoost",
+      "test_r2": 0.9427,
+      "train_r2": 0.9589,
+      "mae": 91985.12,
+      "status": "Excellent"
+    }
+  ]
+}

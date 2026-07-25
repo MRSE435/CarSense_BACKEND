@@ -1,0 +1,170 @@
+{
+    "Xgboost": [
+        {
+            "label": "car_name",
+            "value": 40.90361785888672
+        },
+        {
+            "label": "model",
+            "value": 31.348661422729492
+        },
+        {
+            "label": "brand",
+            "value": 13.104391098022461
+        },
+        {
+            "label": "fuel_type",
+            "value": 4.203439712524414
+        },
+        {
+            "label": "max_power",
+            "value": 4.116905689239502
+        },
+        {
+            "label": "engine",
+            "value": 3.20542311668396
+        },
+        {
+            "label": "vehicle_age",
+            "value": 2.062927484512329
+        },
+        {
+            "label": "km_driven",
+            "value": 0.39601749181747437
+        },
+        {
+            "label": "mileage",
+            "value": 0.388956218957901
+        },
+        {
+            "label": "seller_type",
+            "value": 0.2696649432182312
+        }
+    ],
+    "RandomForest": [
+        {
+            "label": "max_power",
+            "value": 63.85129964793329
+        },
+        {
+            "label": "vehicle_age",
+            "value": 22.088652813974342
+        },
+        {
+            "label": "engine",
+            "value": 4.401298554124175
+        },
+        {
+            "label": "km_driven",
+            "value": 3.3468103182923556
+        },
+        {
+            "label": "car_name",
+            "value": 1.5651203438582155
+        },
+        {
+            "label": "model",
+            "value": 1.4272635696272822
+        },
+        {
+            "label": "mileage",
+            "value": 1.3769935926155041
+        },
+        {
+            "label": "brand",
+            "value": 0.9665294386724406
+        },
+        {
+            "label": "seller_type",
+            "value": 0.53151723687757
+        },
+        {
+            "label": "fuel_type",
+            "value": 0.4445144840248388
+        }
+    ],
+    "Linear": [
+        {
+            "label": "model",
+            "value": 37.42074379770794
+        },
+        {
+            "label": "car_name",
+            "value": 37.42074379770788
+        },
+        {
+            "label": "brand",
+            "value": 23.04753150913054
+        },
+        {
+            "label": "fuel_type",
+            "value": 0.8773359293537895
+        },
+        {
+            "label": "vehicle_age",
+            "value": 0.69585870039058
+        },
+        {
+            "label": "max_power",
+            "value": 0.26644148105039467
+        },
+        {
+            "label": "seller_type",
+            "value": 0.15313327812900548
+        },
+        {
+            "label": "km_driven",
+            "value": 0.07525389627615336
+        },
+        {
+            "label": "engine",
+            "value": 0.030119699226722627
+        },
+        {
+            "label": "mileage",
+            "value": 0.012837911026973058
+        }
+    ],
+    "Lasso": [
+        {
+            "label": "vehicle_age",
+            "value": 53.05506704087571
+        },
+        {
+            "label": "max_power",
+            "value": 33.62180887758452
+        },
+        {
+            "label": "km_driven",
+            "value": 5.767241679218459
+        },
+        {
+            "label": "mileage",
+            "value": 3.7895306898638674
+        },
+        {
+            "label": "engine",
+            "value": 3.766351712457447
+        },
+        {
+            "label": "car_name",
+            "value": 0.0
+        },
+        {
+            "label": "brand",
+            "value": 0.0
+        },
+        {
+            "label": "seller_type",
+            "value": 0.0
+        },
+        {
+            "label": "model",
+            "value": 0.0
+        },
+        {
+            "label": "fuel_type",
+            "value": 0.0
+        }
+    ]
+}
