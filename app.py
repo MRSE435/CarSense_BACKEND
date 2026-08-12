@@ -1,4 +1,5 @@
 import copy
+from urllib import response
 
 from flask import Flask, request, jsonify
 import joblib
@@ -6,11 +7,17 @@ import pandas as pd
 import numpy as np
 from flask_cors import CORS
 import json
+import jwt
+import os
+from dotenv import load_dotenv
+load_dotenv()
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 pipeline = joblib.load('./TrainedModels/xgboostmodel_tuned.pkl')
+secret=os.getenv("SECRET_KEY")
+print("SECRET KEY:", secret)
 @app.route('/')
-def hello_world():  # put application's code here
+def hello_world():
     return 'Hello World!'
 
 models = {
@@ -45,6 +52,7 @@ def chart_data():
     data = df[["km_driven", "selling_price"]].sample(500,random_state=42).to_dict(orient="records")
 
     return jsonify(data)
+
 
 
 @app.route("/data-car_names")
@@ -99,5 +107,26 @@ def table_data():
     with open("model_comparison.json", "r") as f:
         data=json.load(f)
     return jsonify(data)
+
+
+@app.route("/login",methods=['POST'])
+def login():
+    data=request.get_json()
+    Username=data["Username"]
+    Email=data["Email"]
+    Password=data["Password"]
+    if(Username == "hello" and Email=="hello@gmail.com" and Password=="hello123"):
+        token=jwt.encode({"Userid":1},secret,algorithm="HS256")
+        response=jsonify({
+            "message":"login successful",
+        })
+        response.set_cookie(
+            "access_token",
+            token,
+            httponly=True,
+            samesite="lax"
+        )
+        return response,200
+
 if __name__ == '__main__':
     app.run()
