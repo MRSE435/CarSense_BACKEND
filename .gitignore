@@ -1,0 +1,17 @@
+# Environment files (CRITICAL: keeps DATABASE_URL safe)
+.env
+*.env
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
