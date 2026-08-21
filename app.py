@@ -10,11 +10,13 @@ import json
 import jwt
 import os
 from dotenv import load_dotenv
+import  psycopg2
 load_dotenv()
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 pipeline = joblib.load('./TrainedModels/xgboostmodel_tuned.pkl')
 secret=os.getenv("SECRET_KEY")
+DATABASE_URL=os.getenv("DATABASE_URL")
 print("SECRET KEY:", secret)
 @app.route('/')
 def hello_world():
@@ -115,6 +117,9 @@ def login():
     Username=data["Username"]
     Email=data["Email"]
     Password=data["Password"]
+    print("Username:", repr(Username))
+    print("Email:", repr(Email))
+    print("Password:", repr(Password))
     if(Username == "hello" and Email=="hello@gmail.com" and Password=="hello123"):
         token=jwt.encode({"Userid":1},secret,algorithm="HS256")
         response=jsonify({
@@ -127,6 +132,18 @@ def login():
             samesite="lax"
         )
         return response,200
+
+@app.route("/register",methods=['POST'])
+def register():
+    data=request.get_json()
+    Username=data["Username"]
+    Email=data["Email"]
+    Password=data["Password"]
+    print(data)
+
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("INSERT INTO users (username,email,password_hash) values (%s,%s,%s)",(Username,Email,Password))
 
 if __name__ == '__main__':
     app.run()
