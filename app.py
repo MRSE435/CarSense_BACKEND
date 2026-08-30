@@ -11,6 +11,7 @@ import jwt
 import os
 from dotenv import load_dotenv
 import  psycopg2
+import bcrypt
 load_dotenv()
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
@@ -120,18 +121,45 @@ def login():
     print("Username:", repr(Username))
     print("Email:", repr(Email))
     print("Password:", repr(Password))
-    if(Username == "hello" and Email=="hello@gmail.com" and Password=="hello123"):
-        token=jwt.encode({"Userid":1},secret,algorithm="HS256")
-        response=jsonify({
-            "message":"login successful",
+
+    # checking if username and password entered by user is correct
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("Select  *from  users where Email=%s ",
+                           ( Email,))
+            userfoundstatus=cursor.fetchone()
+
+    if not userfoundstatus:
+        print("User not found")
+    userid=userfoundstatus[0]
+    dbusername=userfoundstatus[1]
+    dbemail=userfoundstatus[2]
+    dbpassword=userfoundstatus[3]
+
+    if not bcrypt.checkpw(Password.encode("utf-8"), dbpassword.encode("utf-8")):
+        return jsonify({
+            "message":"Incorrect Password",
         })
-        response.set_cookie(
-            "access_token",
-            token,
-            httponly=True,
-            samesite="lax"
-        )
-        return response,200
+
+
+    if Username!=dbusername and Email!=dbemail:
+        return jsonify({
+            "message":"invalid credentials",
+        })
+                
+
+
+    token=jwt.encode({"Userid":1},secret,algorithm="HS256")
+    response=jsonify({
+       "message":"login successful",
+     })
+    response.set_cookie(
+        "access_token",
+         token,
+        httponly=True,
+         samesite="lax"
+     )
+    return response,200
 
 @app.route("/register",methods=['POST'])
 def register():
@@ -140,10 +168,15 @@ def register():
     Email=data["Email"]
     Password=data["Password"]
     print(data)
-
+    password_hash=bcrypt.hashpw(
+        Password.encode("utf-8"),
+        bcrypt.gensalt()
+    )
+    password_hash_str=password_hash.decode("utf-8")
+    print("Type being inserted:", type(password_hash_str))
     with psycopg2.connect(DATABASE_URL) as conn:
         with conn.cursor() as cursor:
-            cursor.execute("INSERT INTO users (username,email,password_hash) values (%s,%s,%s)",(Username,Email,Password))
+            cursor.execute("INSERT INTO users (username,email,password_hash) values (%s,%s,%s)",(Username,Email,password_hash_str))
 
 if __name__ == '__main__':
     app.run()
