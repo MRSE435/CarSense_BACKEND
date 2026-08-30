@@ -49,6 +49,30 @@ def predict():
 
 
 
+@app.before_request
+def checkauth():
+    print("Testing if this middleware is  running or not")
+    print("endpoint",request.endpoint)
+    print("cookies",request.cookies)
+    public_endpoints={
+        "login",
+        "register"
+    }
+
+    if request.endpoint in public_endpoints:
+        return
+
+    token=request.cookies.get("access_token")
+
+    if not token:
+        return jsonify({
+            "message":"Authentication Required",
+        }),401
+
+
+
+
+
 @app.route("/chart-data")
 def chart_data():
     df = pd.read_csv("car.csv")
@@ -175,6 +199,7 @@ def register():
     password_hash_str=password_hash.decode("utf-8")
     print("Type being inserted:", type(password_hash_str))
     with psycopg2.connect(DATABASE_URL) as conn:
+
         with conn.cursor() as cursor:
             cursor.execute("INSERT INTO users (username,email,password_hash) values (%s,%s,%s)",(Username,Email,password_hash_str))
 
