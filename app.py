@@ -69,6 +69,22 @@ def checkauth():
             "message":"Authentication Required",
         }),401
 
+    try:
+        decoded=jwt.decode(
+            token,
+            secret,
+            algorithms=["HS256"]
+        )
+
+        request.user_id=decoded["Userid"]
+
+    except jwt.InvalidTokenError:
+        return jsonify({
+            "message":"Invalid Token Error",
+        }),401
+
+
+
 
 
 
