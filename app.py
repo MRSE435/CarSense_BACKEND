@@ -59,6 +59,9 @@ def checkauth():
         "register"
     }
 
+    if request.method == "OPTIONS":
+        print("OPTIONS REQUEST - SKIPPING AUTH")
+        return None
     if request.endpoint in public_endpoints:
         return
 
@@ -182,7 +185,7 @@ def login():
         })
 
 
-    if Username!=dbusername and Email!=dbemail:
+    if  Email!=dbemail:
         return jsonify({
             "message":"invalid credentials",
         })
@@ -204,10 +207,22 @@ def login():
 @app.route("/register",methods=['POST'])
 def register():
     data=request.get_json()
-    Username=data["Username"]
-    Email=data["Email"]
-    Password=data["Password"]
+    Username=data.get("Username","").strip()
+    Email=data.get("Email","").strip()
+    Password=data.get("Password","").strip()
     print(data)
+    if not Username :
+        return jsonify({"message":"username is required"}),400
+
+    if not Email:
+        return jsonify({"message":"email is required"}),400
+
+    if not "@" in Email or not "." in Email:
+        return jsonify({"message":"invalid email"}),400
+
+    if not Password:
+        return jsonify({"message":"password is required"}),400
+
     password_hash=bcrypt.hashpw(
         Password.encode("utf-8"),
         bcrypt.gensalt()
