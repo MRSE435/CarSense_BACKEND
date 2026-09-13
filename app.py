@@ -155,6 +155,26 @@ def table_data():
     return jsonify(data)
 
 
+@app.route("/userinfo")
+def userinfo():
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("Select  *from  users where id=%s ",
+                           ( request.user_id,))
+            userinfo=cursor.fetchone()
+
+    return  jsonify({
+        "Username":userinfo[1],
+        "Email":userinfo[2]
+    })
+
+
+@app.route("/logout",methods=["POST"])
+def logout():
+    response=jsonify({"message":"logged out"})
+    response.delete_cookie("access_token")
+    return response,200
+
 @app.route("/login",methods=['POST'])
 def login():
     data=request.get_json()
@@ -200,6 +220,7 @@ def login():
         "access_token",
          token,
         httponly=True,
+        max_age=60*60*24,
          samesite="lax"
      )
     return response,200
