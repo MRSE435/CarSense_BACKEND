@@ -31,11 +31,12 @@ models = {
     "xgboost": joblib.load("TrainedModels/xgboostmodel_tuned.pkl"),
 }
 
-def savepredictions(data):
+def SaveFormInput(data):
     print("saving predictions")
     with psycopg2.connect(DATABASE_URL) as conn:
         with conn.cursor() as cursor:
-            cursor.execute("Insert into predictions  (user_id,car_name,brand,model,vehicle_age,km_driven,seller_type,fuel_type,engine,max_power,mileage,transmission_type) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            cursor.execute("""Insert into predictions  (user_id,car_name,brand,model,vehicle_age,km_driven,seller_type,fuel_type,engine,max_power,mileage,transmission_type) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                           RETURNING prediction_id""",
                            ( request.user_id,
             data["car_name"],
             data["brand"],
@@ -49,8 +50,27 @@ def savepredictions(data):
             data["mileage"],
             data["transmission_type"]
             ))
+            predictionid=cursor.fetchone()[0]
+    return predictionid
 
-    return
+
+def savepredictions(predictionresults):
+    predictionid=predictionresults["prediction_id"]
+    with psycopg2.connect(DATABASE_URL) as conn:
+        for key,value in predictionresults.items():
+            if key!="prediction_id":
+               with conn.cursor() as cursor:
+                    cursor.execute("""INSERT INTO predictionresults(prediction_id,model_names,predicted_price) values(%s,%s,%s)""",
+                    (
+                       predictionid,
+                       key,
+                       value
+                    ))
+
+
+
+
+
 
 with open("predictions.json","r")as f:
     metadeta = json.load(f)
@@ -58,12 +78,17 @@ with open("predictions.json","r")as f:
 def predict():
     data = request.get_json()
     input_df = pd.DataFrame([data])
-    savepredictions(data)
+    predictionid=SaveFormInput(data)
+    predictionresults={}
     response=copy.deepcopy(metadeta)
     for name, pipeline in models.items():
         log_price = pipeline.predict(input_df)[0]
         price = np.expm1(log_price)
         response["models"][name]["prediction"] = round(float(price), 2)
+        predictionresults[name]=round(float(price), 2)
+
+    predictionresults["prediction_id"]=predictionid
+    savepredictions(predictionresults)
 
     return jsonify(response)
 
