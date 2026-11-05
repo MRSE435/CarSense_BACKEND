@@ -12,3 +12,4 @@ xgboost==3.3.0
 PyJWT==2.15.1
 bcrypt==5.0.0
 python-dotenv==1.2.4
+psycopg2-binary
