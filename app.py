@@ -31,6 +31,46 @@ models = {
     "xgboost": joblib.load("TrainedModels/xgboostmodel_tuned.pkl"),
 }
 
+def SaveFormInput(data):
+    print("saving predictions")
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""Insert into predictions  (user_id,car_name,brand,model,vehicle_age,km_driven,seller_type,fuel_type,engine,max_power,mileage,transmission_type) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                           RETURNING prediction_id""",
+                           ( request.user_id,
+            data["car_name"],
+            data["brand"],
+            data["model"],
+            data["vehicle_age"],
+            data["km_driven"],
+            data["seller_type"],
+            data["fuel_type"],
+            data["engine"],
+            data["max_power"],
+            data["mileage"],
+            data["transmission_type"]
+            ))
+            predictionid=cursor.fetchone()[0]
+    return predictionid
+
+
+def savepredictions(predictionresults):
+    predictionid=predictionresults["prediction_id"]
+    with psycopg2.connect(DATABASE_URL) as conn:
+        for key,value in predictionresults.items():
+            if key!="prediction_id":
+               with conn.cursor() as cursor:
+                    cursor.execute("""INSERT INTO predictionresults(prediction_id,model_names,predicted_price) values(%s,%s,%s)""",
+                    (
+                       predictionid,
+                       key,
+                       value
+                    ))
+
+
+
+
+
 
 with open("predictions.json","r")as f:
     metadeta = json.load(f)
@@ -38,12 +78,17 @@ with open("predictions.json","r")as f:
 def predict():
     data = request.get_json()
     input_df = pd.DataFrame([data])
-
+    predictionid=SaveFormInput(data)
+    predictionresults={}
     response=copy.deepcopy(metadeta)
     for name, pipeline in models.items():
         log_price = pipeline.predict(input_df)[0]
         price = np.expm1(log_price)
         response["models"][name]["prediction"] = round(float(price), 2)
+        predictionresults[name]=round(float(price), 2)
+
+    predictionresults["prediction_id"]=predictionid
+    savepredictions(predictionresults)
 
     return jsonify(response)
 
@@ -178,10 +223,10 @@ def logout():
 @app.route("/login",methods=['POST'])
 def login():
     data=request.get_json()
-    Username=data["Username"]
+    # Username=data["Username"]
     Email=data["Email"]
     Password=data["Password"]
-    print("Username:", repr(Username))
+    # print("Username:", repr(Username))
     print("Email:", repr(Email))
     print("Password:", repr(Password))
 
@@ -195,7 +240,7 @@ def login():
     if not userfoundstatus:
         print("User not found")
     userid=userfoundstatus[0]
-    dbusername=userfoundstatus[1]
+    # dbusername=userfoundstatus[1]
     dbemail=userfoundstatus[2]
     dbpassword=userfoundstatus[3]
 
@@ -212,7 +257,7 @@ def login():
                 
 
 
-    token=jwt.encode({"Userid":1},secret,algorithm="HS256")
+    token=jwt.encode({"Userid":userid},secret,algorithm="HS256")
     response=jsonify({
        "message":"login successful",
      })
